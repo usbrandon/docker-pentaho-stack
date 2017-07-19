@@ -1,0 +1,23 @@
+DROP TABLE IF EXISTS pentaho_operations_mart.dim_batch;
+DROP TABLE IF EXISTS pentaho_operations_mart.dim_date;
+DROP TABLE IF EXISTS pentaho_operations_mart.dim_execution;
+DROP TABLE IF EXISTS pentaho_operations_mart.dim_executor;
+DROP TABLE IF EXISTS pentaho_operations_mart.dim_time;
+DROP TABLE IF EXISTS pentaho_operations_mart.dim_log_table;
+DROP TABLE IF EXISTS pentaho_operations_mart.dim_step;
+DROP TABLE IF EXISTS pentaho_operations_mart.fact_execution;
+DROP TABLE IF EXISTS pentaho_operations_mart.fact_step_execution;
+DROP TABLE IF EXISTS pentaho_operations_mart.fact_jobentry_execution;
+DROP TABLE IF EXISTS pentaho_operations_mart.fact_perf_execution;
+
+DROP TABLE IF EXISTS pentaho_operations_mart.DIM_STATE;
+DROP TABLE IF EXISTS pentaho_operations_mart.DIM_SESSION;
+DROP TABLE IF EXISTS pentaho_operations_mart.DIM_INSTANCE;
+DROP TABLE IF EXISTS pentaho_operations_mart.DIM_COMPONENT;
+DROP TABLE IF EXISTS pentaho_operations_mart.STG_CONTENT_ITEM;
+DROP TABLE IF EXISTS pentaho_operations_mart.DIM_CONTENT_ITEM;
+DROP TABLE IF EXISTS pentaho_operations_mart.FACT_SESSION;
+DROP TABLE IF EXISTS pentaho_operations_mart.FACT_INSTANCE;
+DROP TABLE IF EXISTS pentaho_operations_mart.FACT_COMPONENT;
+DROP TABLE IF EXISTS pentaho_operations_mart.PRO_AUDIT_STAGING;
+DROP TABLE IF EXISTS pentaho_operations_mart.PRO_AUDIT_TRACKER;

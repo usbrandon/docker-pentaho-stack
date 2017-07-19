@@ -1,0 +1,95 @@
+version: "3.3"
+
+services:
+  biserver:
+    image: usbrandon/biserver-ce:7.1.0.2-40
+#    hostname: ${SERVER_HOST}
+    command: biserver
+    deploy:
+      placement:
+        constraints:
+#          - node.hostname == docker2
+#          Forces this container to come up on a swarm node aptly equiped
+          - node.labels.stack_group == bi 
+    ports:
+      - "${SERVER_HTTP_PORT}:8080"
+      - "${SERVER_AJP_PORT}:8009"
+    volumes:
+      - ./ext:/bi-ext:ro
+      - ./bind-mounts/biserver/.pentaho:/pentaho/pentaho-server/.pentaho:rw
+      - ./bind-mounts/biserver/hsqldb:/pentaho/pentaho-server/data/hsqldb:rw
+      - ./bind-mounts/biserver/logs:/pentaho/pentaho-server/tomcat/logs:rw
+      - ./bind-mounts/biserver/repository:/pentaho/pentaho-server/pentaho-solutions/system/jackrabbit/repository:rw
+      - ./bind-mounts/biserver/tmp:/pentaho/pentaho-server/tmp:rw
+      - ./bind-mounts/biserver/usermap:/pentaho/pentaho-server/EXT-SessionStartUp:rw
+      - ./bind-mounts/biserver:/pentaho/pentaho-server/pentaho-solutions/system/default-content:rw
+    environment:
+      APPLY_PATCHES: 'Y'
+      BI_JAVA_OPTS: '${BI_JAVA_OPTS}'
+      HOST_USER_ID: ${HOST_USER_ID}
+      STORAGE_TYPE: ${STORAGE_TYPE}
+      PDI_HADOOP_CONFIG: ${PDI_HADOOP_CONFIG}
+      PDI_MAX_LOG_LINES: ${PDI_MAX_LOG_LINES}
+      PDI_MAX_LOG_TIMEOUT: ${PDI_MAX_LOG_TIMEOUT}
+      PDI_MAX_OBJ_TIMEOUT: ${PDI_MAX_OBJ_TIMEOUT}
+      SERVER_NAME: ${SERVER_NAME}
+      SERVER_HOST: ${SERVER_HOST}
+      SERVER_PORT: ${SERVER_EXT_PORT}
+    # still need below even using docker engine 1.12
+    # see more at https://github.com/docker/docker/issues/21051 and https://docs.docker.com/engine/security/seccomp/
+    security_opt:
+      - seccomp:unconfined
+    # https://fabiokung.com/2014/03/13/memory-inside-linux-containers/
+    #mem_limit: 5000M
+    #memswap_limit: 5000M
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 65535
+        hard: 65535
+    restart: always
+  mariadb:
+    image: mariadb:10.3
+    deploy:
+      placement:
+        constraints:
+#          - node.hostname == docker2
+          - node.labels.stack_group == bi
+    ports:
+       - "3306:3306"
+    environment:
+       - MYSQL_ROOT_PASSWORD=SuperDudePassword
+    volumes:
+       - mysql-data:/var/lib/mysql
+       - ./mariadb-init/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+  wordpress:
+    depends_on:
+       - mariadb 
+    image: bitnami/wordpress:latest
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == docker2
+          - node.labels.stack_group == bi
+    ports:
+       - '80:80'
+       - '443:443'
+    environment:
+      MARIADB_HOST: mariadb
+      WORDPRESS_DATABASE_USER: wp_user
+      WORDPRESS_DATABASE_PASSWORD: BirdBirdBirdIsTheWord
+      WORDPRESS_DATABASE_NAME: wordpress
+      WORDPRESS_FIRST_NAME: Brandon
+      WORDPRESS_LAST_NAME: Jackson
+      WORDPRESS_BLOG_NAME: "Blog"
+    volumes:
+      - bitnami_apache:/bitnami/apache
+      - bitnami_wordpress:/bitnami/wordpress
+      - bitnami_php:/bitnami/php
+
+volumes:
+  mysql-data:
+    driver: local
+  bitnami_apache:
+  bitnami_wordpress:
+  bitnami_php:
