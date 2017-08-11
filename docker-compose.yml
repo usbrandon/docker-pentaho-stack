@@ -57,8 +57,10 @@ services:
           - node.labels.stack_group == bi
     ports:
        - "3306:3306"
+    secrets:
+       - mariadb_root_password
     environment:
-       - MYSQL_ROOT_PASSWORD=SuperDudePassword
+       - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/mariadb_root_password
     volumes:
        - mysql-data:/var/lib/mysql
        - ./mariadb-init/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
@@ -86,6 +88,9 @@ services:
       - bitnami_apache:/bitnami/apache
       - bitnami_wordpress:/bitnami/wordpress
       - bitnami_php:/bitnami/php
+secrets:
+  mariadb_root_password:
+    file: ./secrets/mariadb_root_password
 
 volumes:
   mysql-data:
