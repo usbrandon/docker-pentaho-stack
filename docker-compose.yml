@@ -2,15 +2,15 @@ version: "3.3"
 
 services:
   biserver:
-    image: usbrandon/biserver-ce:7.1.0.2-40
+    image: usbrandon/biserver-ce:7.1.0.3-54
 #    hostname: ${SERVER_HOST}
     command: biserver
-    deploy:
-      placement:
-        constraints:
+#    deploy:
+#      placement:
+#        constraints:
 #          - node.hostname == docker2
 #          Forces this container to come up on a swarm node aptly equiped
-          - node.labels.stack_group == bi 
+#          - node.labels.stack_group == bi 
     ports:
       - "${SERVER_HTTP_PORT}:8080"
       - "${SERVER_AJP_PORT}:8009"
@@ -50,11 +50,11 @@ services:
     restart: always
   mariadb:
     image: mariadb:10.3
-    deploy:
-      placement:
-        constraints:
+#    deploy:
+#      placement:
+#       constraints:
 #          - node.hostname == docker2
-          - node.labels.stack_group == bi
+#          - node.labels.stack_group == bi
     ports:
        - "3306:3306"
     secrets:
@@ -68,11 +68,11 @@ services:
     depends_on:
        - mariadb 
     image: bitnami/wordpress:latest
-    deploy:
-      placement:
-        constraints:
-          - node.hostname == docker2
-          - node.labels.stack_group == bi
+#    deploy:
+#      placement:
+#        constraints:
+            #          - node.hostname == docker2
+            #- node.labels.stack_group == bi
     ports:
        - '80:80'
        - '443:443'

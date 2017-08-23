@@ -19,7 +19,7 @@ MAINTAINER Brandon Jackson <usbrandon@gmail.com>
 # Set environment variables
 #  - Adapting the build environment similar to CBF2
 
-ENV BISERVER_VERSION=7.1 BISERVER_BUILD=7.1.0.2-40 PDI_PATCH=7.0.0.0.3 \
+ENV BISERVER_VERSION=7.1 BISERVER_BUILD=7.1.0.3-54 PDI_PATCH=7.0.0.0.3 \
 	BISERVER_HOME=/pentaho/pentaho-server BISERVER_USER=pentaho \
         KETTLE_HOME=/home/pentaho \
 #	KETTLE_HOME=/pentaho-server/pentaho-solutions/system/kettle \
@@ -36,7 +36,7 @@ LABEL java_server="Pentaho BA Server ${BISERVER_VERSION} Community Edition"
 
 # Install vanilla Pentaho server along with minor changes to configuration
 
-ADD /image-init-files/biserver/software/pentaho-server-ce-7.1.0.2-40.zip software/
+ADD /image-init-files/biserver/software/pentaho-server-ce-7.1.0.3-54.zip software/
 RUN echo "Unpack Pentaho server..." \
 	&& unzip -q software/*.zip -d /pentaho \
 	&& rm -rf software \
@@ -87,30 +87,30 @@ RUN echo "Unpack Pentaho server..." \
 
 # Configure EXT Startup and DynamicFilter
 
-ADD ./image-init-files/biserver/customizations/applicationContext-EXT-DynamicDataFiltering.xml /pentaho/pentaho-server/pentaho-solutions/system/
-ADD ./image-init-files/biserver/customizations/applicationContext-EXT-SessionStartUp.xml /pentaho/pentaho-server/pentaho-solutions/system/
-ADD ./image-init-files/biserver/customizations/EXT-DynamicDataFiltering-3.1.1.jar /pentaho/pentaho-server/tomcat/webapps/pentaho/WEB-INF/lib/
-ADD ./image-init-files/biserver/customizations/EXT-DynamicDataFiltering.properties /pentaho/pentaho-server/tomcat/webapps/pentaho/WEB-INF/classes/
+#ADD ./image-init-files/biserver/customizations/applicationContext-EXT-DynamicDataFiltering.xml /pentaho/pentaho-server/pentaho-solutions/system/
+#ADD ./image-init-files/biserver/customizations/applicationContext-EXT-SessionStartUp.xml /pentaho/pentaho-server/pentaho-solutions/system/
+#ADD ./image-init-files/biserver/customizations/EXT-DynamicDataFiltering-3.1.1.jar /pentaho/pentaho-server/tomcat/webapps/pentaho/WEB-INF/lib/
+#ADD ./image-init-files/biserver/customizations/EXT-DynamicDataFiltering.properties /pentaho/pentaho-server/tomcat/webapps/pentaho/WEB-INF/classes/
 
 # Add internal Pentaho Data Integration environment variables to the container for the $BISERVER_USER
 #   1. Add the applicationContext-EXT-SessionStartup.xml to pentaho-spring-beans.xml
 #   2. Enable CDA caching segments by tenant ID's (different companies)
-ADD ./image-init-files/biserver/customizations/kettle.properties /home/$BISERVER_USER/.kettle/
-RUN chown pentaho:pentaho /home/pentaho/.kettle/kettle.properties \
-    && perl -pi -e 's#</beans>#<import resource="applicationContext-EXT-SessionStartUp.xml" /><import resource="applicationContext-EXT-DynamicDataFiltering.xml" /></beans>#' /pentaho/pentaho-server/pentaho-solutions/system/pentaho-spring-beans.xml \
+#ADD ./image-init-files/biserver/customizations/kettle.properties /home/$BISERVER_USER/.kettle/
+#RUN chown pentaho:pentaho /home/pentaho/.kettle/kettle.properties \
+#    && perl -pi -e 's#</beans>#<import resource="applicationContext-EXT-SessionStartUp.xml" /><import resource="applicationContext-EXT-DynamicDataFiltering.xml" /></beans>#' /pentaho/pentaho-server/pentaho-solutions/system/pentaho-spring-beans.xml \
 #       perl -pi -e 's#requireService ["analyzer/vizApi.conf"] = "pentaho.config.spec.IRuleSet#//requireService ["analyzer/vizApi.conf"] = "pentaho.config.spec.IRuleSet#' /pentaho/pentaho-server/pentaho-solutions/system/analyzer/scripts/analyzer-require-js-cfg.js && \
-    && sed -i -e '$apt.webdetails.cda.cache.extraCacheKeys.tenant_id=${[session:tenant_id]}' /pentaho/pentaho-server/pentaho-solutions/system/cda/cda.properties
+RUN    sed -i -e '$apt.webdetails.cda.cache.extraCacheKeys.tenant_id=${[session:tenant_id]}' /pentaho/pentaho-server/pentaho-solutions/system/cda/cda.properties
         # && \
         # perl -pi -e 's#<prop key="admin">password,Administrator,Authenticated</prop>#<prop key="admin">password,Administrator,Authenticated</prop><prop key="Amy">password,Administrator,Authenticated</prop>#<prop key="James">password,Administrator,Authenticated</prop><prop key="Richard">#password,Administrator,Authenticated</prop><prop key="John">password,Administrator,Authenticated</prop>#' /pentaho/pentaho-server/pentaho-solutions/system/applicationContext-spring-security-memory.xml
 
 
 # Place the custom login page
 
-COPY ./image-init-files/biserver/customizations/custom_login/index.jsp /pentaho/pentaho-server/tomcat/webapps/pentaho/
-COPY ./image-init-files/biserver/customizations/custom_login/jsp/PUCLogin.jsp /pentaho/pentaho-server/tomcat/webapps/pentaho/jsp/
-COPY ./image-init-files/biserver/customizations/custom_login/images/logo.png /pentaho/pentaho-server/tomcat/webapps/pentaho-style/images/
-COPY ./image-init-files/biserver/customizations/custom_login/images/hero.mp4 /pentaho/pentaho-server/tomcat/webapps/pentaho-style/images/
-COPY ./image-init-files/biserver/customizations/custom_login/images/video_placeholder.jpg /pentaho/pentaho-server/tomcat/webapps/pentaho-style/images/
+#COPY ./image-init-files/biserver/customizations/custom_login/index.jsp /pentaho/pentaho-server/tomcat/webapps/pentaho/
+#COPY ./image-init-files/biserver/customizations/custom_login/jsp/PUCLogin.jsp /pentaho/pentaho-server/tomcat/webapps/pentaho/jsp/
+#COPY ./image-init-files/biserver/customizations/custom_login/images/logo.png /pentaho/pentaho-server/tomcat/webapps/pentaho-style/images/
+#COPY ./image-init-files/biserver/customizations/custom_login/images/hero.mp4 /pentaho/pentaho-server/tomcat/webapps/pentaho-style/images/
+#COPY ./image-init-files/biserver/customizations/custom_login/images/video_placeholder.jpg /pentaho/pentaho-server/tomcat/webapps/pentaho-style/images/
 
 # Change work directory
 
